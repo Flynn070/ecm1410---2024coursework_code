@@ -3,13 +3,25 @@ package cycling;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 
 public class CyclingPortalImpl implements MiniCyclingPortal{
 
+	public ArrayList<Race> RaceArray = new ArrayList<Race>();	//Array of all race ids that exist
+
 	@Override
 	public int[] getRaceIds() {
-		// TODO Auto-generated method stub
-		return null;
+		if (RaceArray.size() > 0){
+			int[] returnArray = new int[RaceArray.size()];
+			int i = 0;
+			for (Race n : RaceArray){	//iterate through arraylist assigning to array
+				returnArray[i++] = n.getID();
+			}
+			return returnArray;
+		}
+		else{
+			return new int[0];
+		}
 	}
 
 	@Override
@@ -24,8 +36,15 @@ public class CyclingPortalImpl implements MiniCyclingPortal{
             throw new InvalidNameException("Name must not be over 30 characters");
         }
         else if(name.contains(" ")){
-            throw new InvalidNameException("Name must not contain whitespace")
+            throw new InvalidNameException("Name must not contain whitespace");
         }
+		Race NewRace;
+		int NewRaceID = 
+		
+		RaceArray.add()
+			
+		)
+
 		// TODO Auto-generated method stub
 		return 0;
 	}
@@ -33,6 +52,7 @@ public class CyclingPortalImpl implements MiniCyclingPortal{
 	@Override
 	public String viewRaceDetails(int raceId) throws IDNotRecognisedException {
 		// TODO Auto-generated method stub
+
 		return null;
 	}
 
