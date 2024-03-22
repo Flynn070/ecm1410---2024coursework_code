@@ -8,20 +8,33 @@ import java.util.ArrayList;
 public class CyclingPortalImpl implements MiniCyclingPortal{
 
 	public ArrayList<Race> RaceArray = new ArrayList<Race>();	//Array of all race ids that exist
+	public ArrayList<Stage> StageArray = new ArrayList<Stage>();
+	public ArrayList<Rider> RiderArray = new ArrayList<Rider>();
+	public ArrayList<Team> TeamArray = new ArrayList<Team>();
+	
+	public int getRaceIndex(int raceId){
+		return 0; //TODO make a get index
+	}
+	public int getStageIndex(int stageId){
+		return 0;
+	}
+	public int getRiderIndex(int riderId){
+		return 0;
+	}
+	public int getTeamIndex(int teamId){
+		return 0;
+	}
 
 	@Override
 	public int[] getRaceIds() {
-		if (RaceArray.size() > 0){
-			int[] returnArray = new int[RaceArray.size()];
+		int[] ReturnArray = new int[RaceArray.size()];
+		if (RaceArray.size() > 0){ //if arraylist is populated
 			int i = 0;
 			for (Race n : RaceArray){	//iterate through arraylist assigning to array
-				returnArray[i++] = n.getID();
+				ReturnArray[i++] = n.getID();
 			}
-			return returnArray;
 		}
-		else{
-			return new int[0];
-		}
+		return ReturnArray;
 	}
 
 	@Override
@@ -38,54 +51,86 @@ public class CyclingPortalImpl implements MiniCyclingPortal{
         else if(name.contains(" ")){
             throw new InvalidNameException("Name must not contain whitespace");
         }
-		Race NewRace;
-		int NewRaceID = 
-		
-		RaceArray.add()
-			
-		)
 
-		// TODO Auto-generated method stub
-		return 0;
+		Race NewRace = new Race(); //Instantiate new race class
+		NewRace.setName(name);// TODO create race id 
+		NewRace.setDesc(description);
+		RaceArray.add(NewRace);
+
+		return NewRace.getID();	//return id of race
 	}
 
 	@Override
 	public String viewRaceDetails(int raceId) throws IDNotRecognisedException {
-		// TODO Auto-generated method stub
+		Race CurrentRace = RaceArray.get(getRaceIndex(raceId));
+		int TotalLength = 0; //TODO add up lengths of all stages
+		int StageCount = getNumberOfStages(raceId); //TODO also add amount of stages
 
-		return null;
+		return String.format("%s, : \n Race ID: %s \n %s \n %d Stages, %dm in total", CurrentRace.getName(), CurrentRace.getID(), CurrentRace.getDesc(), StageCount, TotalLength);
 	}
 
 	@Override
 	public void removeRaceById(int raceId) throws IDNotRecognisedException {
-		// TODO Auto-generated method stub
+		int RaceIndex = getRaceIndex(raceId);
+		RaceArray.remove(RaceIndex);
 
 	}
 
 	@Override
 	public int getNumberOfStages(int raceId) throws IDNotRecognisedException {
-		// TODO Auto-generated method stub
-		return 0;
+		// TODO check this actually works
+		return RaceArray.get(getRaceIndex(raceId)).getStages().size();
 	}
 
 	@Override
 	public int addStageToRace(int raceId, String stageName, String description, double length, LocalDateTime startTime,
 			StageType type)
 			throws IDNotRecognisedException, IllegalNameException, InvalidNameException, InvalidLengthException {
-		// TODO Auto-generated method stub
+				if(stageName == null){
+					throw new InvalidNameException("Name must not be null");
+				}
+				else if(stageName == ""){
+					throw new InvalidNameException("Name must not be empty");
+				}
+				else if(stageName.length() > 30){
+					throw new InvalidNameException("Name must not be over 30 characters");
+				}
+				else if(stageName.contains(" ")){
+					throw new InvalidNameException("Name must not contain whitespace");
+				}
+		// TODO add id not recognised
+		int RaceIndex = getRaceIndex(raceId);
+		Race CurrentRace = RaceArray.get(RaceIndex); //Gets desired race
+		Stage NewStage = new Stage();	//Creates new stage
+		NewStage.setName(stageName);
+		NewStage.setType(type);
+		NewStage.setDesc(description);
+		NewStage.setLength(length);
+		CurrentRace.addStage(NewStage.getID());	//adds stage to race
+		RaceArray.set(RaceIndex, CurrentRace); //Replaces race in array with race with added stage
+		//TODO return stage id
 		return 0;
 	}
 
 	@Override
 	public int[] getRaceStages(int raceId) throws IDNotRecognisedException {
-		// TODO Auto-generated method stub
-		return null;
+		int RaceIndex = getRaceIndex(raceId);
+		ArrayList<Integer> RaceStages = new ArrayList<Integer>();
+		RaceStages = RaceArray.get(RaceIndex).getStages();
+		int[] ReturnArray = new int[RaceStages.size()];
+		if (RaceStages.size() > 0){
+			int i = 0;
+			for (int n : RaceArray.get(RaceIndex).getStages()){ //gets each stage in race
+				ReturnArray[i++] = n;
+			}
+		}
+		
+		return ReturnArray;
 	}
 
 	@Override
 	public double getStageLength(int stageId) throws IDNotRecognisedException {
-		// TODO Auto-generated method stub
-		return 0;
+		StageIndex = getStageIndex(stageId);
 	}
 
 	@Override

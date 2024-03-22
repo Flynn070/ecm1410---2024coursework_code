@@ -4,7 +4,8 @@ import java.util.ArrayList;
 
 public class Race {
     private String RaceName;
-    private Integer RaceID;
+    private String RaceDesc;
+    private int RaceID;
     private ArrayList<Integer> Stages;//stores ID of each 
 
     // Name functions
@@ -14,8 +15,14 @@ public class Race {
     public void setName(String NewName){
         this.RaceName = NewName;
     }
+    public String getDesc(){
+        return RaceDesc;
+    }
+    public void setDesc(String NewDesc){
+        this.RaceDesc = NewDesc;
+    }
     //ID functions
-    public Integer getID(){
+    public int getID(){
         return RaceID;
     }
     //Checkpoint functions

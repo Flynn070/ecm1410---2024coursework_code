@@ -4,8 +4,10 @@ import java.util.ArrayList;
 
 public class Stage {
     
+    private int StageID;
     private String StageName;
-    private Integer StageID;
+    private String StageDesc;
+    private double StageLength;
     private ArrayList<Integer> Checkpoints;//stores ID of each checkpoint, unused if time-trial
     private StageType StageType;
 
@@ -16,13 +18,33 @@ public class Stage {
     public void setName(String NewName){
         this.StageName = NewName;
     }
-    //ID functions
-    public Integer getID(){
+
+    public int getID(){
         return StageID;
+    }
+    public void setID(int NewID){
+        this.StageID = NewID;
+    }
+
+    public String getDesc(){
+        return StageDesc;
+    }
+    public void setDesc(String NewDesc){
+        this.StageDesc = NewDesc;
+    }
+
+    public double getLength(){
+        return StageLength;
+    }
+    public void setLength(double NewLength){
+        this.StageLength = NewLength;
     }
 
     public StageType getType(){
         return StageType;
+    }
+    public void setType(StageType NewType){
+        this.StageType = NewType;
     }
     //Checkpoint functions
     public ArrayList<Integer> getCheckpoints(){

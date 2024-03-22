@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class Rider {
 
     private String RiderName;
-    private Integer RiderID;
+    private int RiderID;
 
 // Name functions
     public String getName(){
@@ -15,7 +15,7 @@ public class Rider {
         this.RiderName = NewName;
     }
     //ID functions
-    public Integer getID(){
+    public int getID(){
         return RiderID;
     }
 
