@@ -4,19 +4,30 @@ import java.util.ArrayList;
 
 public class Team {
     private String TeamName;
+    private String TeamDesc;
     private Integer TeamID;
     private ArrayList<Integer> Riders;//stores ID of each rider
 
-    // Name functions
+    // Name
     public String getName(){
         return TeamName;
     }
     public void setName(String NewName){
         this.TeamName = NewName;
     }
-    //ID functions
+    //ID
     public Integer getID(){
         return TeamID;
+    }
+    public void setID(int newId){
+        this.TeamID = newId;
+    }
+    //description
+    public String getDesc(){
+        return TeamDesc;
+    }
+    public void setDesc(String newDesc){
+        this.TeamDesc = newDesc;
     }
     //Checkpoint functions
     public ArrayList<Integer> getRiders(){
@@ -33,7 +44,7 @@ public class Team {
     }
 
     public String toString(){
-        return null;
+        return null;//TODO add tostring
     }
 }
  
