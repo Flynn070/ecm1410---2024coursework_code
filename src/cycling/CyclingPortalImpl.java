@@ -143,6 +143,22 @@ public class CyclingPortalImpl implements MiniCyclingPortal{
 		}
 		return ReturnList;
 	}
+	private ArrayList<Integer> getOrderedCheckpoints(int stageId) throws IDNotRecognisedException{
+		int StageIndex = getStageIndex(stageId, -1, -1);
+		//ordering checkpoints by location in race
+		ArrayList<Integer> Checkpoints = StageArray.get(StageIndex).getCheckpoints();	//ids of checkpoints in stage
+		int i, j;	//loop variables
+		for (i=1; i<Checkpoints.size(); i++){    //loops from second element of list to end
+			Integer removed = Checkpoints.remove(i);	//removes current checkpoint from list
+			j = i - 1;
+			Double RemovedLocation = CheckpointArray.get(getCheckpointIndex(removed, -1, -1)).getLocation();	//gets location of removed checkpoint
+			while (j >= 0 && RemovedLocation < CheckpointArray.get(getCheckpointIndex(Checkpoints.get(j), -1, -1)).getLocation()){  //loops until location before current is found
+				j -= 1;
+			}
+			Checkpoints.add(j+1, removed);   //adds the result into place after the faster time
+		}	//checkpoints are now sorted in order in stage
+		return Checkpoints;
+	}
 
 	@Override
 	public int[] getRaceIds() {
@@ -541,130 +557,239 @@ public class CyclingPortalImpl implements MiniCyclingPortal{
 
 	@Override
 	public int[] getRidersPointsInStage(int stageId) throws IDNotRecognisedException {
-		int StageIndex = getStageIndex(stageId, -1, -1);	
-		Stage CurrentStage = StageArray.get(StageIndex);	//gets the stage to get points from
+		Stage CurrentStage = StageArray.get(getStageIndex(stageId, -1, -1));	//gets the stage to get points from
 		ArrayList<Result> StageRiders = CurrentStage.getSortedElapsedResults();	//gets arraylist of riders and resultsin order of finishing times
 		int[] Points = new int[StageRiders.size()];	//array to be returned, will be ordered same as arraylist
 		Arrays.fill(Points, 0);	//ensures all array values are 0
 		if (CurrentStage.getCheckpoints().size() < 2){	//if stage does not have at least a start and finish
 			return Points;	//return empty array
 		}
-
-		if (CurrentStage.getType() != StageType.TT || CurrentStage.getCheckpoints().size() > 2){	//if stage is TT or has no checkpoints then no need to search for intermediate sprint
-			//ordering checkpoints by location in race
-			ArrayList<Integer> Checkpoints = StageArray.get(StageIndex).getCheckpoints();	//ids of checkpoints in stage
-			int i, j;	//loop variables
-			for (i=1; i<Checkpoints.size(); i++){    //loops from second element of list to end
-				Integer removed = Checkpoints.remove(i);	//removes current checkpoint from list
-				j = i - 1;
-				Double RemovedLocation = CheckpointArray.get(getCheckpointIndex(removed, -1, -1)).getLocation();	//gets location of removed checkpoint
-				while (j >= 0 && RemovedLocation < CheckpointArray.get(getCheckpointIndex(Checkpoints.get(j), -1, -1)).getLocation()){  //loops until location before current is found
-					j -= 1;
-				}
-				Checkpoints.add(j+1, removed);   //adds the result into place after the faster time
-			}	//checkpoints are now sorted in order in stage
-			i = 0;
-			
-			// adding points for intermediate sprints rank
-			for (Integer n : Checkpoints){
-				if (CheckpointArray.get(getCheckpointIndex(n, -1, -1)).getType() == CheckpointType.SPRINT){	//checks if any sprint checkpoints are in stage
-					ArrayList<Result> CheckpointFinishers = CurrentStage.getSortedCheckpointResults(i);	//gets results sorted by cross of sprint checkpoint
-					j = 0;
-					for (j=0;j<15;j++){
-						int FinishingRiderID = CheckpointFinishers.get(j).getID();
-						int k = 0;	//yet another loop variable
-						while (StageRiders.get(k).getID() != FinishingRiderID){		//finds rider's location in stageriders and Points
-							k += 1;
-						}
-						switch(j){	//assigns points based on rider's rank
-							case 0:	//if rider came first
-								Points[k] += 20;
-								break;
-							case 1:	//if rider came second... etc
-								Points[k] += 17;
-								break;
-							case 2:
-								Points[k] += 15;
-								break;
-							case 3:
-								Points[k] += 13;
-								break;
-							default:
-								Points[k] += 15-j;	//calcs points based on formula for 5th place and under
-						}
+		ArrayList<Integer> Checkpoints = getOrderedCheckpoints(stageId);	//gets checkpoints in stage order
+		
+		// adding points for intermediate sprints rank
+		int i = 1;	//starts on 1 to skip over start time
+		int j = 0;
+		for (Integer n : Checkpoints){
+			if (CheckpointArray.get(getCheckpointIndex(n, -1, -1)).getType() == CheckpointType.SPRINT){	//checks if any sprint checkpoints are in stage
+				ArrayList<Result> CheckpointFinishers = CurrentStage.getSortedCheckpointResults(i);	//gets results sorted by cross of sprint checkpoint
+				j = 0;
+				for (j=0;j<15;j++){
+					int FinishingRiderID = CheckpointFinishers.get(j).getID();	//get the ID of the rider in each rank
+					int k = 0;	//yet another loop variable
+					while (StageRiders.get(k).getID() != FinishingRiderID){		//finds rider's location in stageriders and Points
+						k += 1;
+					}
+					switch(j){	//assigns points based on rider's rank
+						case 0:	//if rider came first
+							Points[k] += 20;
+							break;
+						case 1:	//if rider came second... etc
+							Points[k] += 17;
+							break;
+						case 2:
+							Points[k] += 15;
+							break;
+						case 3:
+							Points[k] += 13;
+							break;
+						default:
+							Points[k] += 15-j;	//calcs points based on formula for 5th place and under
 					}
 				}
-				i += 1;
 			}
+			i += 1;
+		}
 
-			// adding points for stage finishing rank
-			//points array is already sorted in order of rider finish times, can assign immediately
-			//assigning without a loop to reduce operations
-			if (CurrentStage.getType() == StageType.TT || CurrentStage.getType() == StageType.HIGH_MOUNTAIN){	//tt and high mountain give same points
-				Points[0] += 20;	
-				Points[1] += 17;	
-				Points[2] += 15;
-				Points[3] += 13;
-				Points[4] += 11;
-				Points[5] += 10;
-				Points[6] += 9;
-				Points[7] += 8;
-				Points[8] += 7;
-				Points[9] += 6;
-				Points[10] += 5;
-				Points[11] += 4;
-				Points[12] += 3;
-				Points[13] += 2;
-				Points[14] += 1;
-			}
-			else if(CurrentStage.getType() == StageType.MEDIUM_MOUNTAIN){
-				Points[0] += 30;	
-				Points[1] += 25;	
-				Points[2] += 22;
-				Points[3] += 19;
-				Points[4] += 17;
-				Points[5] += 15;
-				Points[6] += 13;
-				Points[7] += 11;
-				Points[8] += 9;
-				Points[9] += 7;
-				Points[10] += 6;
-				Points[11] += 5;
-				Points[12] += 4;
-				Points[13] += 3;
-				Points[14] += 2;
-			}
-			else{	//stagetype must be flat
-				Points[0] += 50;	
-				Points[1] += 30;	
-				Points[2] += 20;
-				Points[3] += 18;
-				Points[4] += 16;
-				Points[5] += 14;
-				Points[6] += 12;
-				Points[7] += 10;
-				Points[8] += 8;
-				Points[9] += 7;
-				Points[10] += 6;
-				Points[11] += 5;
-				Points[12] += 4;
-				Points[13] += 3;
-				Points[14] += 2;
-			}
+		// adding points for stage finishing rank
+		//points array is already sorted in order of rider finish times, can assign immediately
+		//assigning without a loop to reduce operations
+		if (CurrentStage.getType() == StageType.TT || CurrentStage.getType() == StageType.HIGH_MOUNTAIN){	//tt and high mountain give same points
+			Points[0] += 20;	
+			Points[1] += 17;	
+			Points[2] += 15;
+			Points[3] += 13;
+			Points[4] += 11;
+			Points[5] += 10;
+			Points[6] += 9;
+			Points[7] += 8;
+			Points[8] += 7;
+			Points[9] += 6;
+			Points[10] += 5;
+			Points[11] += 4;
+			Points[12] += 3;
+			Points[13] += 2;
+			Points[14] += 1;
+		}
+		else if(CurrentStage.getType() == StageType.MEDIUM_MOUNTAIN){
+			Points[0] += 30;	
+			Points[1] += 25;	
+			Points[2] += 22;
+			Points[3] += 19;
+			Points[4] += 17;
+			Points[5] += 15;
+			Points[6] += 13;
+			Points[7] += 11;
+			Points[8] += 9;
+			Points[9] += 7;
+			Points[10] += 6;
+			Points[11] += 5;
+			Points[12] += 4;
+			Points[13] += 3;
+			Points[14] += 2;
+		}
+		else{	//stagetype must be flat
+			Points[0] += 50;	
+			Points[1] += 30;	
+			Points[2] += 20;
+			Points[3] += 18;
+			Points[4] += 16;
+			Points[5] += 14;
+			Points[6] += 12;
+			Points[7] += 10;
+			Points[8] += 8;
+			Points[9] += 7;
+			Points[10] += 6;
+			Points[11] += 5;
+			Points[12] += 4;
+			Points[13] += 3;
+			Points[14] += 2;
 		}
 		return Points;
 	}
 
 	@Override
 	public int[] getRidersMountainPointsInStage(int stageId) throws IDNotRecognisedException {
-		// TODO Auto-generated method stub
-		return null;
+		Stage CurrentStage = StageArray.get(getStageIndex(stageId, -1, -1));	//gets the stage to get points from
+		ArrayList<Result> StageRiders = CurrentStage.getSortedElapsedResults();	//gets arraylist of riders and resultsin order of finishing times
+		int[] MountainPoints = new int[StageRiders.size()];	//array to be returned, will be ordered same as arraylist
+		Arrays.fill(MountainPoints, 0);	//ensures all array values are 0
+		
+		if (CurrentStage.getType() == StageType.TT || CurrentStage.getCheckpoints().size() < 3){	//if stage is TT or has no checkpoints then no need to search for mountain checkpoints
+			return MountainPoints;
+		}
+		ArrayList<Integer> Checkpoints = getOrderedCheckpoints(stageId);	//gets checkpoints in stage order
+
+		int i = 1;
+		int j = 0;
+		int k = 0;	//loop variables
+		for (Integer n: Checkpoints){
+			Checkpoint CurrentCheckpoint = CheckpointArray.get(getCheckpointIndex(n, -1, -1));
+			if (CurrentCheckpoint.getType() != CheckpointType.SPRINT){
+				ArrayList<Result> CheckpointFinishers = CurrentStage.getSortedCheckpointResults(i);	//gets results sorted by cross of sprint checkpoint
+				j = 0;
+				k = 0;
+				switch (CurrentCheckpoint.getType()){	//assign points based on checkpoint type
+					//HC checkpoint
+					case HC:
+						for (j=0;j<8;j++){	//get first 8 riders
+							int FinishingRiderID = CheckpointFinishers.get(j).getID();	//get the ID of the rider in each rank
+							while (StageRiders.get(k).getID() != FinishingRiderID){		//finds rider's location in stageriders and Points
+								k += 1;
+							}
+							switch (j){	//assign points based on rank in checkpoint
+								case 0:
+									MountainPoints[k] += 20;
+									break;
+								case 1:
+									MountainPoints[k] += 15;
+									break;
+								default:
+									MountainPoints[k] += 18 - ((j+1)*2);	//calc avoids writing out every case
+									break;
+							}
+						}
+						break;
+					//1C checkpoint
+					case C1:
+						for (j=0;j<6;j++){	//get first 6 riders
+							int FinishingRiderID = CheckpointFinishers.get(j).getID();	//get the ID of the rider in each rank
+							while (StageRiders.get(k).getID() != FinishingRiderID){		//finds rider's location in stageriders and Points
+								k += 1;
+							}
+							switch (j){	//assign points based on rank in checkpoint
+								case 0:	//first
+									MountainPoints[k] += 10;
+									break;
+								case 1:	//second
+									MountainPoints[k] += 8;
+									break;
+								case 2:	//third.. etc
+									MountainPoints[k] += 6;
+									break;
+								case 3:
+									MountainPoints[k] += 4;
+									break;
+								case 4:
+									MountainPoints[k] += 2;
+									break;
+								case 5:
+									MountainPoints[k] += 1;
+									break;
+							}
+						}
+						break;
+					//2C checkpoint
+					case C2:
+						for (j=0;j<4;j++){	//get first 4 riders
+							int FinishingRiderID = CheckpointFinishers.get(j).getID();	//get the ID of the rider in each rank
+							while (StageRiders.get(k).getID() != FinishingRiderID){		//finds rider's location in stageriders and Points
+								k += 1;
+							}
+							switch (j){	//assign points based on rank in checkpoint
+								case 0:	//first
+									MountainPoints[k] += 5;
+									break;
+								case 1:	//second
+									MountainPoints[k] += 3;
+									break;
+								case 2:	//third.. etc
+									MountainPoints[k] += 2;
+									break;
+								case 3:
+									MountainPoints[k] += 1;
+									break;
+							}
+						}
+						break;
+					//3C checkpoint
+					case C3:
+						for (j=0;j<2;j++){	//get first 2 riders
+							int FinishingRiderID = CheckpointFinishers.get(j).getID();	//get the ID of the rider in each rank
+							while (StageRiders.get(k).getID() != FinishingRiderID){		//finds rider's location in stageriders and Points
+								k += 1;
+							}
+							switch (j){	//assign points based on rank in checkpoint
+								case 0:	//first
+									MountainPoints[k] += 2;
+									break;
+								case 1:	//second
+									MountainPoints[k] += 1;
+									break;
+							}
+						}
+						break;
+					//4C checkpoint
+					case C4:
+					int FinishingRiderID = CheckpointFinishers.get(j).getID();	//get the ID of the rider that gets first
+					while (StageRiders.get(k).getID() != FinishingRiderID){		//finds rider's location in stageriders and Points
+						k += 1;
+					}
+					MountainPoints[k] += 1;
+					default:
+						break;	// /should/ never run
+				}
+			}
+		}
+		return MountainPoints;
 	}
 
 	@Override
 	public void eraseCyclingPortal() {
-		// TODO Auto-generated method stub
-
+		RaceArray = new ArrayList<Race>();
+		StageArray = new ArrayList<Stage>();
+		CheckpointArray = new ArrayList<Checkpoint>();
+		RiderArray = new ArrayList<Rider>();
+		TeamArray = new ArrayList<Team>();
 	}
 
 	@Override
