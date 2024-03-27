@@ -6,9 +6,9 @@ public class Checkpoint {
     
     private Integer CheckpointID;
     private CheckpointType CheckpointType;
-    private double Location;
-    private double AverageGradient = 0; //default to 0, used for climbs
-    private double Length;
+    private Double Location;
+    private Double AverageGradient; //used for climbs
+    private Double Length;
     private Integer Stage;
 
     //ID
