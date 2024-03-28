@@ -49,8 +49,8 @@ public class Stage implements Serializable{
      * Sets ID of stage, should be unique and only be set at stage creation to avoid issues
      * @param newId unique int ID number to identify stage
      */
-    public void setID(int newId){
-        this.stageId = newId;
+    public void setID(int newID){
+        this.stageId = newID;
     }
 
     /**

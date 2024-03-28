@@ -107,7 +107,7 @@ public class Race implements Serializable{
     /**
      * Replaces the entire list of riders - should only be used when resetting entire rider list, list should be sorted from lowest to highest ID value
      * To just add or remove a single rider, use {@link #addRider} and {@link #removeRider respectively
-     * @param NewRiders ArrayList of integers of rider IDs
+     * @param NewRiders
      */
     public void setRiders(ArrayList<Integer> NewRiders){
         this.riders = NewRiders;
