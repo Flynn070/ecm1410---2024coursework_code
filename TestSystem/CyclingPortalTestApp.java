@@ -34,6 +34,7 @@ public class CyclingPortalTestApp {
 
 		try {
 			portal1.createTeam("TeamOne", "My favorite");
+			System.out.println("portal1 create team");
 			portal2.createTeam("TeamOne", "My favorite");
 		} catch (IllegalNameException e) {
 			e.printStackTrace();

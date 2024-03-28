@@ -200,6 +200,7 @@ public class CyclingPortalImpl implements MiniCyclingPortal{
 	@Override
 	public String viewRaceDetails(int raceId) throws IDNotRecognisedException {
 		Race currentRace = raceArray.get(getRaceIndex(raceId, -1, -1));				//get current race to avoid repeatedly accessing array
+		assert currentRace.getID() == raceId;									//ensures correct race was found
 		int totalLength = 0; 
 		for (int n : currentRace.getStages()){ 										//gets each stage ID in race
 			totalLength += stageArray.get(getStageIndex(n, -1, -1)).getLength();	//uses stage id to get stage and get length 
@@ -212,6 +213,7 @@ public class CyclingPortalImpl implements MiniCyclingPortal{
 	public void removeRaceById(int raceId) throws IDNotRecognisedException {
 		int raceIndex = getRaceIndex(raceId, -1, -1);
 		Race currentRace = raceArray.get(raceIndex);								//get current race to avoid repeatedly accessing array
+		assert currentRace.getID() == raceId;									//ensures correct race was found
 		// removal of race from riders
 		for (int n : currentRace.getRiders()){ 										//gets ID of each rider in race
 			int riderIndex = getRiderIndex(n, -1, -1);
@@ -284,11 +286,11 @@ public class CyclingPortalImpl implements MiniCyclingPortal{
 
 	@Override
 	public void removeStageById(int stageId) throws IDNotRecognisedException {
-		int stageIndex = getStageIndex(stageId, -1, -1);
-		int raceIndex = getRaceIndex(stageArray.get(stageIndex).getRace(), -1, -1);
+		int stageIndex = getStageIndex(stageId, -1, -1);						//get stage to delete
+		int raceIndex = getRaceIndex(stageArray.get(stageIndex).getRace(), -1, -1);	//get race that stage is in
 		// removing stages checkpoints
-		for (int n : stageArray.get(raceIndex).getCheckpoints()){	//for each checkpoint in a stage
-			checkpointArray.remove(getCheckpointIndex(n, -1, -1));	//gets each checkpoint and removes them
+		for (int n : stageArray.get(raceIndex).getCheckpoints()){			//for each checkpoint in a stage
+			checkpointArray.remove(getCheckpointIndex(n, -1, -1));			//gets each checkpoint and removes them
 		}
 		// removing stage from its race
 		raceArray.get(raceIndex).removeStage(stageId);
@@ -303,6 +305,7 @@ public class CyclingPortalImpl implements MiniCyclingPortal{
 			InvalidStageTypeException {
 		int stageIndex = getStageIndex(stageId, -1, -1);
 		Stage currentStage = stageArray.get(stageIndex);	//stores stage in variable to avoid repeatedly accessing arraylist
+		assert currentStage.getID() == stageId;			//ensures correct stage was found
 		if (currentStage.getType() == StageType.TT){		//checks if stage is a time trial
 			throw new InvalidStageTypeException();
 		}
@@ -332,6 +335,7 @@ public class CyclingPortalImpl implements MiniCyclingPortal{
 		InvalidLocationException, InvalidStageStateException, InvalidStageTypeException {
 		int stageIndex = getStageIndex(stageId, -1, -1);
 		Stage currentStage = stageArray.get(stageIndex);				//stores stage in variable to avoid repeatedly accessing arraylist
+		assert currentStage.getID() == stageId;						//ensures correct stage was found
 		if (currentStage.getType() == StageType.TT){					//checks if stage is a time trial
 			throw new InvalidStageTypeException();
 		}
@@ -522,6 +526,7 @@ public class CyclingPortalImpl implements MiniCyclingPortal{
 		}
 		LocalTime startTime = adjustedTimes.get(i).getCheckpointTimes()[0];				//get start and finish time for rider in stage
 		LocalTime endTime = adjustedTimes.get(i).getCheckpointTimes()[adjustedTimes.get(i).getCheckpointTimes().length-1];
+		assert startTime.isBefore(endTime):"Saved start time is after finish time";
 		return Instant.ofEpochMilli(MILLIS.between(startTime, endTime)).atZone(ZoneId.systemDefault()).toLocalTime();	//converts difference of times from millis back to localtime, giving total elapsed
 	}
 
@@ -555,6 +560,7 @@ public class CyclingPortalImpl implements MiniCyclingPortal{
 	@Override
 	public int[] getRidersPointsInStage(int stageId) throws IDNotRecognisedException {
 		Stage currentStage = stageArray.get(getStageIndex(stageId, -1, -1));		//gets the stage to get points from
+		assert currentStage.getID() == stageId;									//ensures correct stage was found
 		ArrayList<Result> stageRiders = currentStage.getSortedElapsedResults();		//gets arraylist of riders and results in order of finishing times
 		int[] points = new int[stageRiders.size()];									//array to be returned, will be ordered same as arraylist
 		Arrays.fill(points, 0);														//ensures all array values are 0
