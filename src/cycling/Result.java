@@ -1,43 +1,49 @@
 package cycling;
 
-import java.io.IOException;
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import static java.time.temporal.ChronoUnit.MILLIS;
 
-public class Result {
-    private int RiderID;
-    private LocalTime[] CheckpointTimes;
-    private long TotalTime;  //total elapsed time (finish - start) in milliseconds
+public class Result implements Serializable{
+    private int riderId;
+    private LocalTime[] checkpointTimes;
+    private long totalTime;                 //total elapsed time (finish - start) in milliseconds
     //care to be taken with this value as it is a long - cannot be cast down to int
 
 
     //id
     public int getID(){
-        return RiderID;
+        return riderId;
     }
     public void setID(int newId){
-        this.RiderID = newId;
+        this.riderId = newId;
     }
 
     //checkpoint times
     public LocalTime[] getCheckpointTimes(){
-        return CheckpointTimes;
+        return checkpointTimes;
     }
     public void setCheckpointTimes(LocalTime[] newTimes){
-        this.CheckpointTimes = newTimes;
-        this.TotalTime = MILLIS.between(newTimes[0], newTimes[newTimes.length - 1]);
+        this.checkpointTimes = newTimes;
+        this.totalTime = MILLIS.between(newTimes[0], newTimes[newTimes.length - 1]);
     }
-    public void setCheckpointTime(LocalTime newTime, int CheckpointReplaced){
-        this.CheckpointTimes[CheckpointReplaced] = newTime;
-        if (CheckpointReplaced == 0 || CheckpointReplaced == CheckpointTimes.length-1){ //if start or end time edited
-            this.TotalTime = MILLIS.between(CheckpointTimes[0], CheckpointTimes[CheckpointTimes.length - 1]);  //recalc the elapsed time
+    public void setCheckpointTime(LocalTime newTime, int checkpointReplaced){
+        this.checkpointTimes[checkpointReplaced] = newTime;                                 //insert the time in the correct checkpoint location
+        if (checkpointReplaced == 0 || checkpointReplaced == checkpointTimes.length-1){     //if start or end time edited
+            this.totalTime = MILLIS.between(checkpointTimes[0], checkpointTimes[checkpointTimes.length - 1]);  //recalc the elapsed time
         }
     }
 
-    //totaltime
+    //totaltime - no setter, should automatically be updated 
     public long getTotalTime(){
-        return TotalTime;
+        return totalTime;
+    }
+
+    public String toString(){
+        String checkpointTimesString = "";
+        for (LocalTime n : checkpointTimes){
+            checkpointTimesString += n.toString() + "\n";
+        }
+        return String.format("Rider ID: %s \n Total Time: %d \nIndividual Times:\n%s", riderId, totalTime, checkpointTimesString);
     }
 }

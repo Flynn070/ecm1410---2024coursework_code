@@ -1,45 +1,54 @@
 package cycling;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Rider {
+public class Rider implements Serializable{
 
-    private String RiderName;
-    private int RiderID;
-    private ArrayList<Integer> CompetedRaces = new ArrayList<Integer>();
-    private int Team = -1;   //ID of team rider is in, -1 when rider does not have a team
+    private String riderName;
+    private int riderId;
+    private ArrayList<Integer> competedRaces = new ArrayList<Integer>();    //arraylist of IDs of races the rider has competed in
+    private int team = -1;      //ID of team rider is in, -1 when rider does not have a team
+    private int yearOfBirth;
 
     // Name
     public String getName(){
-        return RiderName;
+        return riderName;
     }
-    public void setName(String NewName){
-        this.RiderName = NewName;
+    public void setName(String newName){
+        this.riderName = newName;
     }
     //ID
     public int getID(){
-        return RiderID;
+        return riderId;
     }
-    public void setID(int NewID){
-        this.RiderID = NewID;
+    public void setID(int newId){
+        this.riderId = newId;
     }
     // races
     public ArrayList<Integer> getRaces(){
-        return CompetedRaces;
+        return competedRaces;
     }
-    public void setRaces(ArrayList<Integer> NewRaces){
-        this.CompetedRaces = NewRaces;
+    public void setRaces(ArrayList<Integer> newRaces){
+        this.competedRaces = newRaces;
     }
     //team
     public int getTeam(){
-        return Team;
+        return team;
     }
     public void setTeam(int newTeam){
-        this.Team = newTeam;
+        this.team = newTeam;
+    }
+    //year
+    public int getBirth(){
+        return yearOfBirth;
+    }
+    public void setBirth(int newBirth){
+        this.yearOfBirth = newBirth;
     }
 
     public String toString(){
-        return null;//TODO add tostring
+        return String.format("Rider Name: %s \nID: %d \n Born %d", riderName, riderId, yearOfBirth);
     }
 
     
