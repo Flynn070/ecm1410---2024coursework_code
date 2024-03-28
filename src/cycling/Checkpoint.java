@@ -4,15 +4,15 @@ import java.io.Serializable;
 
 public class Checkpoint implements Serializable{
     
-    private Integer checkpointId;
+    private int checkpointId;
     private CheckpointType checkpointCheckpointType;
     private Double location;
     private Double averageGradient; //used for climbs
     private Double length;
-    private Integer stage;
+    private int stage;
 
     //ID
-    public Integer getID(){
+    public int getID(){
         return checkpointId;
     }
     public void setID(int newId){
@@ -47,11 +47,11 @@ public class Checkpoint implements Serializable{
         this.length = newLength;
     }
     //stage
-    public Integer getStage(){
+    public int getStage(){
         return stage;
     }
-    public void setStage(Integer NewStage){
-        this.stage = NewStage;
+    public void setStage(int newStage){
+        this.stage = newStage;
     }
 
     public String toString(){

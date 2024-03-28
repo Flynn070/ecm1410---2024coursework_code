@@ -6,18 +6,18 @@ import java.util.ArrayList;
 public class Team implements Serializable{
     private String teamName;
     private String teamDesc;
-    private Integer teamId;
+    private int teamId;
     private ArrayList<Integer> riders;//stores ID of each rider
 
     // Name
     public String getName(){
         return teamName;
     }
-    public void setName(String NewName){
-        this.teamName = NewName;
+    public void setName(String newName){
+        this.teamName = newName;
     }
     //ID
-    public Integer getID(){
+    public int getID(){
         return teamId;
     }
     public void setID(int newId){

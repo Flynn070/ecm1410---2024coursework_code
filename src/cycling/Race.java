@@ -14,22 +14,22 @@ public class Race implements Serializable{
     public String getName(){
         return raceName;
     }
-    public void setName(String NewName){
-        this.raceName = NewName;
+    public void setName(String newName){
+        this.raceName = newName;
     }
     //Desc
     public String getDesc(){
         return raceDesc;
     }
-    public void setDesc(String NewDesc){
-        this.raceDesc = NewDesc;
+    public void setDesc(String newDesc){
+        this.raceDesc = newDesc;
     }
     //ID 
     public int getID(){
         return raceId;
     }
-    public void setID(int NewID){
-        this.raceId = NewID;
+    public void setID(int newId){
+        this.raceId = newId;
     }
     //Stage
     public ArrayList<Integer> getStages(){
