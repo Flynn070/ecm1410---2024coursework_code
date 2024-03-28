@@ -78,14 +78,14 @@ public class Rider implements Serializable{
 
     /**
      * Gets year of riders birth
-     * @return int > 1900
+     * @return int greater than 1900
      */
     public int getBirth(){
         return yearOfBirth;
     }
     /**
-     * Sets the year of the riders birth. Should not be < 1900
-     * @param newBirth int > 1900
+     * Sets the year of the riders birth. Should not be less than 1900
+     * @param newBirth int greater than 1900
      */
     public void setBirth(int newBirth){
         this.yearOfBirth = newBirth;
